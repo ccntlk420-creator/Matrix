@@ -100,6 +100,11 @@ const TRANSLATIONS = {
     common: {
         back: "Вернуться на главную",
         request: "Официальный запрос:"
+    },
+    cookies: {
+      text: "Мы используем файлы cookie для улучшения вашего опыта. Продолжая использование сайта, вы соглашаетесь с нашей ",
+      link: "Политикой cookie",
+      btn: "Принять"
     }
   },
   EN: {
@@ -169,6 +174,11 @@ const TRANSLATIONS = {
     common: {
         back: "Back to Home",
         request: "Official Request:"
+    },
+    cookies: {
+      text: "We use cookies to improve your experience. By continuing to use the site, you agree to our ",
+      link: "Cookie Policy",
+      btn: "Accept"
     }
   }
 };
@@ -330,11 +340,53 @@ function ScrollToTop() {
   return null;
 }
 
+function CookieBanner() {
+  const { t } = useTranslation();
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const consent = localStorage.getItem('cookieConsent');
+    if (!consent) {
+      const timer = setTimeout(() => setIsVisible(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const accept = () => {
+    localStorage.setItem('cookieConsent', 'true');
+    setIsVisible(false);
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <motion.div 
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="fixed bottom-6 left-6 right-6 md:left-auto md:right-12 md:max-w-md z-[200] bg-[#1a1a1a] border border-primary/10 p-6 shadow-2xl rounded-sm"
+    >
+      <div className="flex flex-col gap-6">
+        <p className="font-body text-sm text-on-surface-variant/80 leading-relaxed font-light">
+          {t.cookies.text}
+          <Link to={POLICIES.cookies.path} className="text-primary hover:underline">{t.cookies.link}</Link>.
+        </p>
+        <button 
+          onClick={accept}
+          className="gold-gradient text-black px-8 py-2.5 rounded-sm font-label text-[10px] uppercase tracking-[0.2em] font-bold active:scale-95 transition-all text-center w-full md:w-fit self-end"
+        >
+          {t.cookies.btn}
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
 function Layout({ children }: { children: React.ReactNode }) {
   const { lang, setLang, t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-surface selection:bg-primary selection:text-on-primary">
+      <CookieBanner />
       {/* Top Navigation Bar */}
       <nav className="fixed top-0 w-full z-[100] bg-[#131313] backdrop-blur-md border-b border-primary/10 flex justify-between items-center px-6 md:px-12 pt-[calc(env(safe-area-inset-top)+1.25rem)] pb-5 md:py-5 transition-all duration-300 before:content-[''] before:absolute before:-top-[500px] before:left-0 before:right-0 before:h-[500px] before:bg-[#131313]">
         <Link to="/" className="text-xl font-headline font-bold text-primary tracking-[0.1em] uppercase">
