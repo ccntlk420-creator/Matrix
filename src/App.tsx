@@ -9,10 +9,169 @@ import {
   ShieldCheck, 
   Lock, 
   ChevronDown, 
-  ChevronLeft
+  ChevronLeft,
+  Instagram,
+  Globe
 } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext, useContext } from "react";
 import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
+
+type Language = 'RU' | 'EN';
+
+interface LanguageContextType {
+  lang: Language;
+  setLang: (lang: Language) => void;
+  t: any;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+const useTranslation = () => {
+  const context = useContext(LanguageContext);
+  if (!context) throw new Error("useTranslation must be used within a LanguageProvider");
+  return context;
+};
+
+const TRANSLATIONS = {
+  RU: {
+    nav: { about: "О нас", cases: "Кейсы", faq: "FAQ", book: "Забронировать" },
+    hero: {
+      badge: "EST. 2017 • PRIVATE CONCIERGE",
+      top: "Exclusive Access",
+      h1: "Твой билет в",
+      h1Span: "мир люкса.",
+      p: "Бронируем лучшие отели мира со скидкой до 50%. Официально. Безопасно. Только для своих.",
+      btnCases: "Посмотреть кейсы",
+      telegram: "Telegram"
+    },
+    features: [
+      { title: "Прямой доступ", desc: "Минуем розничные наценки агрегаторов через инвентарь туроператоров." },
+      { title: "API и VPN", desc: "Используем региональные ценовые лазейки, доступные только профи." },
+      { title: "Закрытые тарифы", desc: "Эксклюзивные предложения, скрытые от широкой публики." }
+    ],
+    economy: {
+      badge: "Smart Luxury",
+      h2: "Отдыхай как <span class='italic font-light text-primary'>миллионер</span>, <br /> плати как <span class='italic font-light text-primary'>турист</span>.",
+      p: "Мы не просто ищем скидки. Мы открываем двери в мир, который раньше был доступен только через личные связи.",
+      btn: "Начать экономить"
+    },
+    audience: {
+      title: "Для кого наш сервис",
+      items: [
+        { label: "The Connoisseur", title: "Ценитель комфорта", desc: "Для тех, кто привык к 5 звездам и безупречному сервису, но не видит смысла платить маркетинговый налог агрегаторов." },
+        { label: "The Strategist", title: "Стратег", desc: "Для тех, кто планирует сложные маршруты и ценит возможность продлить отпуск в два раза при том же бюджете." },
+        { label: "The Explorer", title: "Активный путешественник", desc: "Для тех, кто всегда в движении и ищет способ получить больше впечатлений от каждой поездки по всему миру." }
+      ]
+    },
+    cases: {
+      h2: "Наши <span class='text-primary italic font-light'>Кейсы.</span>",
+      p: "Реальные бронирования наших клиентов за последний месяц. Сравните цены и убедитесь сами.",
+      items: [
+         { name: "ME Barcelona", loc: "Испания, Барселона • 7 ночей", desc: "Люкс с видом на город. Бронирование через закрытый канал туроператора.", disc: "-45%" },
+         { name: "The Capra Saas-Fee", loc: "Швейцария, Альпы • 5 ночей", desc: "Шале премиум-класса. Использование региональных API цен.", disc: "-40%" }
+      ]
+    },
+    trust: [
+      { val: "2017", label: "Работаем с года" },
+      { val: "526+", label: "Объектов в базе" },
+      { val: "1,375", label: "Доволенных клиентов" },
+      { val: "€342k", label: "Сэкономлено" }
+    ],
+    cta: {
+      h2: "Готовы к <br /> <span class='text-primary italic font-light'>новым открытиям?</span>",
+      btn: "Запросить подборку",
+      btnLink: "Посмотреть кейсы"
+    },
+    faq: {
+      title: "Часто задаваемые вопросы",
+      items: [
+        { q: "Почему цены такие низкие?", a: "Мы используем корпоративные тарифы, доступ к которым имеют только крупные агенты, а также бронируем через партнерские каналы в других регионах, где цены на те же отели значительно ниже." },
+        { q: "Это легально?", a: "Абсолютно. Вы получаете официальный ваучер отеля. Ваше бронирование будет отображаться в системе отеля так же, как если бы вы забронировали его сами." },
+        { q: "Что если я передумаю?", a: "Условия отмены зависят от выбранного тарифа. Мы всегда предлагаем как невозвратные варианты с максимальной скидкой, так и гибкие тарифы с возможностью отмены." }
+      ]
+    },
+    footer: {
+      instagram: "Instagram",
+      copyright: "© 2024 Easy Book. Private Concierge.",
+      owner: "ИП «ИзиТуБук» | ОГРНИП: 325770006482193 | ИНН: 770512483691",
+      address: "Россия, г. Москва, ул. Летниковская, д. 10, стр. 4, офис 219, 115114",
+      ads: "Ads Verification:"
+    },
+    common: {
+        back: "Вернуться на главную",
+        request: "Официальный запрос:"
+    }
+  },
+  EN: {
+    nav: { about: "About Us", cases: "Cases", faq: "FAQ", book: "Book Now" },
+    hero: {
+      badge: "EST. 2017 • PRIVATE CONCIERGE",
+      top: "Exclusive Access",
+      h1: "Your ticket to the",
+      h1Span: "world of luxury.",
+      p: "We book the world's best hotels with discounts up to 50%. Official. Secure. Members only.",
+      btnCases: "View Cases",
+      telegram: "Telegram"
+    },
+    features: [
+      { title: "Direct Access", desc: "We bypass retail markups by aggregators through tour operator inventory." },
+      { title: "API & VPN", desc: "We use regional price loopholes available only to professionals." },
+      { title: "Private Rates", desc: "Exclusive offers hidden from the general public." }
+    ],
+    economy: {
+      badge: "Smart Luxury",
+      h2: "Rest like a <span class='italic font-light text-primary'>millionaire</span>, <br /> pay like a <span class='italic font-light text-primary'>tourist</span>.",
+      p: "We don't just find discounts. We open doors to a world that was only accessible through personal connections.",
+      btn: "Start Saving"
+    },
+    audience: {
+      title: "Who is our service for",
+      items: [
+        { label: "The Connoisseur", title: "Comfort Seeker", desc: "For those who are used to 5 stars and impeccable service but see no point in paying the marketing tax of aggregators." },
+        { label: "The Strategist", title: "Strategist", desc: "For those planning complex routes and valuing the opportunity to double their vacation length on the same budget." },
+        { label: "The Explorer", title: "Active Traveler", desc: "For those always on the move, seeking more experiences from every trip worldwide." }
+      ]
+    },
+    cases: {
+      h2: "Our <span class='text-primary italic font-light'>Cases.</span>",
+      p: "Real bookings for our clients over the past month. Compare prices and see for yourself.",
+      items: [
+         { name: "ME Barcelona", loc: "Spain, Barcelona • 7 nights", desc: "Suite with city view. Booking via a closed tour operator channel.", disc: "-45%" },
+         { name: "The Capra Saas-Fee", loc: "Switzerland, Alps • 5 nights", desc: "Premium chalet. Using regional API pricing.", disc: "-40%" }
+      ]
+    },
+    trust: [
+      { val: "2017", label: "Operating since" },
+      { val: "526+", label: "Hotels in database" },
+      { val: "1,375", label: "Happy clients" },
+      { val: "€342k", label: "Saved" }
+    ],
+    cta: {
+      h2: "Ready for <br /> <span class='text-primary italic font-light'>new discoveries?</span>",
+      btn: "Request Selection",
+      btnLink: "View Cases"
+    },
+    faq: {
+      title: "Frequently Asked Questions",
+      items: [
+        { q: "Why are prices so low?", a: "We use corporate rates accessible only to large agents, and book through partner channels in other regions where prices for the same hotels are significantly lower." },
+        { q: "Is it legal?", a: "Absolutely. You receive an official hotel voucher. Your booking will appear in the hotel's system just as if you had booked it yourself." },
+        { q: "What if I change my mind?", a: "Cancellation terms depend on the chosen rate. We always offer both non-refundable options with maximum discount and flexible rates with cancellation." }
+      ]
+    },
+    footer: {
+      instagram: "Instagram",
+      copyright: "© 2024 Easy Book. Private Concierge.",
+      owner: "IE «EasyToBook» | OGRNIP: 325770006482193 | INN: 770512483691",
+      address: "Russia, Moscow, Letnikovskaya st., 10, bldg. 4, office 219, 115114",
+      ads: "Ads Verification:"
+    },
+    common: {
+        back: "Back to Home",
+        request: "Official Request:"
+    }
+  }
+};
 
 const POLICIES = {
   privacy: {
@@ -172,6 +331,8 @@ function ScrollToTop() {
 }
 
 function Layout({ children }: { children: React.ReactNode }) {
+  const { lang, setLang, t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-surface selection:bg-primary selection:text-on-primary">
       {/* Top Navigation Bar */}
@@ -180,18 +341,48 @@ function Layout({ children }: { children: React.ReactNode }) {
           Easy Book
         </Link>
         <div className="hidden md:flex items-center space-x-10 font-label font-medium text-[10px] tracking-[0.2em] uppercase">
-          <Link to="/" className="text-[#E5E2E1] hover:text-[#FFDEA5] transition-colors duration-300">О нас</Link>
-          <a href="/#cases" className="text-[#E5E2E1] hover:text-[#FFDEA5] transition-colors duration-300">Кейсы</a>
-          <a href="/#faq" className="text-[#E5E2E1] hover:text-[#FFDEA5] transition-colors duration-300">FAQ</a>
+          <Link to="/" className="text-[#E5E2E1] hover:text-[#FFDEA5] transition-colors duration-300">{t.nav.about}</Link>
+          <a href="/#cases" className="text-[#E5E2E1] hover:text-[#FFDEA5] transition-colors duration-300">{t.nav.cases}</a>
+          <a href="/#faq" className="text-[#E5E2E1] hover:text-[#FFDEA5] transition-colors duration-300">{t.nav.faq}</a>
         </div>
-        <a 
-          href="https://t.me/EASYBOOK_HOTELS" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="gold-gradient text-on-primary px-7 py-2.5 rounded-sm font-label text-[10px] uppercase tracking-[0.15em] font-bold active:scale-95 duration-200 inline-block text-center"
-        >
-          Забронировать
-        </a>
+        
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6 border-r border-primary/10 pr-8">
+            {/* Lang Toggle UI matching screenshot */}
+            <div className="flex items-center font-label text-[10px] font-bold tracking-[0.2em]">
+              <button 
+                onClick={() => setLang('RU')}
+                className={`cursor-pointer transition-all ${lang === 'RU' ? 'text-primary' : 'text-[#E5E2E1]/30'}`}
+              >
+                RU
+              </button>
+              <div className="w-px h-3 bg-on-surface/20 mx-3.5"></div>
+              <button 
+                onClick={() => setLang('EN')}
+                className={`cursor-pointer transition-all ${lang === 'EN' ? 'text-primary' : 'text-[#E5E2E1]/30'}`}
+              >
+                EN
+              </button>
+            </div>
+            
+            <a 
+              href="https://www.instagram.com/easy.book_/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#E5E2E1]/60 hover:text-primary transition-colors"
+            >
+              <Instagram size={20} />
+            </a>
+          </div>
+          <a 
+            href="https://t.me/EASYBOOK_HOTELS" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="gold-gradient text-black px-8 py-3 rounded-md font-label text-[10px] uppercase tracking-[0.15em] font-bold active:scale-95 duration-200 inline-block text-center shadow-lg"
+          >
+            {t.nav.book}
+          </a>
+        </div>
       </nav>
 
       <main className="pt-24 md:pt-20">
@@ -201,18 +392,29 @@ function Layout({ children }: { children: React.ReactNode }) {
       {/* Footer */}
       <footer className="w-full py-16 px-6 md:px-12 border-t border-primary/5 bg-[#131313]">
         <div className="flex flex-col md:flex-row justify-between items-center gap-10 max-w-[1920px] mx-auto">
-          <div className="text-xl font-headline font-bold text-primary tracking-[0.1em] uppercase">Easy Book</div>
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <div className="text-xl font-headline font-bold text-primary tracking-[0.1em] uppercase">Easy Book</div>
+            <a 
+              href="https://www.instagram.com/easy.book_/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[#E5E2E1]/40 hover:text-primary transition-colors font-label text-[10px] uppercase tracking-widest"
+            >
+              <Instagram size={16} />
+              <span>{t.footer.instagram}</span>
+            </a>
+          </div>
           <div className="flex gap-10 font-label text-[10px] uppercase tracking-[0.1em]">
             <Link to={POLICIES.privacy.path} className="text-[#E5E2E1]/40 hover:text-primary transition-all duration-300">Privacy Policy</Link>
             <Link to={POLICIES.terms.path} className="text-[#E5E2E1]/40 hover:text-primary transition-all duration-300">Terms of Service</Link>
             <Link to={POLICIES.cookies.path} className="text-[#E5E2E1]/40 hover:text-primary transition-all duration-300">Cookie Policy</Link>
           </div>
-          <div className="font-label text-[10px] uppercase tracking-[0.1em] text-[#E5E2E1]/40 flex flex-col items-center md:items-end gap-2">
-            <div>© 2024 Easy Book. Private Concierge.</div>
+          <div className="font-label text-[10px] uppercase tracking-[0.1em] text-[#E5E2E1]/40 flex flex-col items-center md:items-end gap-2 text-center md:text-right">
+            <div>{t.footer.copyright}</div>
             <div className="text-primary/60 normal-case flex flex-col items-center md:items-end gap-1">
-              <span>ИП «ИзиТуБук» | ОГРНИП: 325770006482193 | ИНН: 770512483691</span>
-              <span>Россия, г. Москва, ул. Летниковская, д. 10, стр. 4, офис 219, 115114</span>
-              <div className="mt-1">Ads Verification: <a href="mailto:ezbook420@gmail.com" className="hover:text-primary underline transition-colors">ezbook420@gmail.com</a></div>
+              <span>{t.footer.owner}</span>
+              <span>{t.footer.address}</span>
+              <div className="mt-1">{t.footer.ads} <a href="mailto:ezbook420@gmail.com" className="hover:text-primary underline transition-colors">ezbook420@gmail.com</a></div>
             </div>
           </div>
         </div>
@@ -222,6 +424,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function Home() {
+  const { t } = useTranslation();
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   return (
@@ -231,7 +434,7 @@ function Home() {
         <div className="lg:w-1/2 flex flex-col justify-center px-6 md:px-20 py-12 md:py-20 relative z-10 bg-surface">
           <div className="absolute top-10 left-10 hidden xl:block">
             <span className="font-label text-[10px] uppercase tracking-[0.4em] text-primary/40 rotate-90 origin-left inline-block whitespace-nowrap">
-              EST. 2017 • PRIVATE CONCIERGE
+              {t.hero.badge}
             </span>
           </div>
           
@@ -241,23 +444,21 @@ function Home() {
             transition={{ duration: 1, ease: "easeOut" }}
           >
             <div className="font-label text-primary text-[10px] uppercase tracking-[0.3em] mb-8 font-semibold">
-              Exclusive Access
+              {t.hero.top}
             </div>
             <h1 className="font-headline text-7xl md:text-8xl lg:text-9xl text-on-surface leading-[0.85] mb-12 uppercase">
-              Твой билет в <br />
-              <span className="italic font-light text-primary">мир люкса.</span>
+              {t.hero.h1} <br />
+              <span className="italic font-light text-primary">{t.hero.h1Span}</span>
             </h1>
             <p className="font-body text-lg md:text-xl text-on-surface-variant max-w-md mb-16 leading-relaxed font-light">
-              Бронируем лучшие отели мира со скидкой до 50%. Официально. Безопасно. Только для своих.
+              {t.hero.p}
             </p>
             <div className="flex flex-col sm:flex-row gap-8">
               <a 
-                href="https://t.me/easybook_hotel"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/#cases"
                 className="gold-gradient text-on-primary px-14 py-6 rounded-sm font-label text-[11px] uppercase tracking-[0.25em] font-bold active:scale-95 transition-all shadow-2xl text-center"
               >
-                Посмотреть кейсы
+                {t.hero.btnCases}
               </a>
               <a 
                 href="https://t.me/EASYBOOK_HOTELS"
@@ -266,7 +467,7 @@ function Home() {
                 className="group flex items-center gap-4 font-label text-[11px] uppercase tracking-[0.25em] text-on-surface hover:text-primary transition-colors"
               >
                 <span className="w-12 h-px bg-primary/30 group-hover:w-16 transition-all"></span>
-                Telegram
+                {t.hero.telegram}
               </a>
             </div>
           </motion.div>
@@ -293,13 +494,9 @@ function Home() {
       {/* New Features Variant: Bordered Grid */}
       <section className="py-0 border-b border-primary/10">
         <div className="grid grid-cols-1 md:grid-cols-3">
-          {[
-            { icon: Key, title: "Прямой доступ", desc: "Минуем розничные наценки агрегаторов через инвентарь туроператоров." },
-            { icon: ShieldCheck, title: "API и VPN", desc: "Используем региональные ценовые лазейки, доступные только профи." },
-            { icon: Lock, title: "Закрытые тарифы", desc: "Эксклюзивные предложения, скрытые от широкой публики." }
-          ].map((feature, i) => (
+          {(t.features as any[]).map((feature, i) => (
             <div key={i} className="p-16 border-r border-primary/10 last:border-r-0 hover:bg-primary/[0.02] transition-colors group">
-              <feature.icon className="text-primary w-10 h-10 mb-10 stroke-[1px] group-hover:scale-110 transition-transform" />
+              {[Key, ShieldCheck, Lock][i] && React.createElement([Key, ShieldCheck, Lock][i], { className: "text-primary w-10 h-10 mb-10 stroke-[1px] group-hover:scale-110 transition-transform" })}
               <h3 className="font-headline text-2xl text-on-surface uppercase tracking-widest mb-6">{feature.title}</h3>
               <p className="font-body text-on-surface-variant leading-relaxed font-light text-sm">
                 {feature.desc}
@@ -313,14 +510,11 @@ function Home() {
       <section className="py-20 md:py-40 px-6 md:px-12 bg-surface-container-lowest">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center justify-center px-4 py-1.5 border border-primary/20 rounded-full mb-10">
-            <span className="font-label text-[9px] uppercase tracking-[0.3em] text-primary leading-none mr-[-0.3em]">Smart Luxury</span>
+            <span className="font-label text-[9px] uppercase tracking-[0.3em] text-primary leading-none mr-[-0.3em]">{t.economy.badge}</span>
           </div>
-          <h2 className="font-headline text-5xl md:text-7xl text-on-surface mb-12 leading-tight uppercase tracking-widest">
-            Отдыхай как <span className="italic font-light text-primary">миллионер</span>, <br />
-            плати как <span className="italic font-light text-primary">турист</span>.
-          </h2>
+          <h2 className="font-headline text-5xl md:text-7xl text-on-surface mb-12 leading-tight uppercase tracking-widest" dangerouslySetInnerHTML={{ __html: t.economy.h2 }}></h2>
           <p className="font-body text-xl text-on-surface-variant mb-16 leading-relaxed font-light max-w-2xl mx-auto">
-            Мы не просто ищем скидки. Мы открываем двери в мир, который раньше был доступен только через личные связи.
+            {t.economy.p}
           </p>
           <a 
             href="https://t.me/EASYBOOK_HOTELS"
@@ -328,7 +522,7 @@ function Home() {
             rel="noopener noreferrer"
             className="gold-gradient text-on-primary px-16 py-6 rounded-sm font-label text-xs uppercase tracking-[0.3em] font-bold active:scale-95 transition-all inline-block shadow-xl"
           >
-            Начать экономить
+            {t.economy.btn}
           </a>
         </div>
       </section>
@@ -337,27 +531,11 @@ function Home() {
       <section className="py-16 md:py-32 px-6 md:px-12 bg-surface">
         <div className="max-w-[1440px] mx-auto">
           <div className="mb-20">
-            <h2 className="font-headline text-4xl text-on-surface uppercase tracking-widest">Для кого наш сервис</h2>
+            <h2 className="font-headline text-4xl text-on-surface uppercase tracking-widest">{t.audience.title}</h2>
             <div className="w-16 h-px bg-primary mt-8"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {[
-              {
-                label: "The Connoisseur",
-                title: "Ценитель комфорта",
-                desc: "Для тех, кто привык к 5 звездам и безупречному сервису, но не видит смысла платить маркетинговый налог агрегаторов."
-              },
-              {
-                label: "The Strategist",
-                title: "Стратег",
-                desc: "Для тех, кто планирует сложные маршруты и ценит возможность продлить отпуск в два раза при том же бюджете."
-              },
-              {
-                label: "The Explorer",
-                title: "Активный путешественник",
-                desc: "Для тех, кто всегда в движении и ищет способ получить больше впечатлений от каждой поездки по всему миру."
-              }
-            ].map((item, i) => (
+            {(t.audience.items as any[]).map((item, i) => (
               <motion.div 
                 key={i}
                 whileHover={{ y: -10 }}
@@ -376,11 +554,9 @@ function Home() {
       <section id="cases" className="py-20 md:py-40 px-6 md:px-12 bg-surface">
         <div className="max-w-[1440px] mx-auto">
           <div className="mb-24 space-y-8">
-            <h2 className="font-headline text-5xl md:text-7xl text-on-surface uppercase tracking-widest leading-none">
-              Наши <span className="text-primary italic font-light">Кейсы.</span>
-            </h2>
+            <h2 className="font-headline text-5xl md:text-7xl text-on-surface uppercase tracking-widest leading-none" dangerouslySetInnerHTML={{ __html: t.cases.h2 }}></h2>
             <p className="font-body text-on-surface-variant/60 max-w-sm font-light text-sm md:text-base leading-relaxed">
-              Реальные бронирования наших клиентов за последний месяц. Сравните цены и убедитесь сами.
+              {t.cases.p}
             </p>
           </div>
           
@@ -388,21 +564,13 @@ function Home() {
             {[
               {
                 img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBm1zs63w0gEkSq0P0N37sNImg8kZWRJBSapBYQtAAko3kry3AVzw7cjHKvQwUDSG1y0zZUwcehIGTKi9ITHz7kIjNpQYKTi8QAeIxX0MbfhDsOQTcKZ2Hfk7bmXimU479DBmwM6jUwUgsqp2OKTHRzfcVU1xYl8zyUFkLCzpC4g9yCRZnG0c_YEGeY93C1sjSqR2KRerS6-9plapcy3OouBeSbldhAEZJfpuHQZFzdL68PrMQa4xN_jgtDyyUR6IsUCbIMAMQtHfnv=s0",
-                name: "ME Barcelona",
-                loc: "Испания, Барселона • 7 ночей",
                 old: "€3,420",
                 new: "€1,890",
-                disc: "-45%",
-                desc: "Люкс с видом на город. Бронирование через закрытый канал туроператора."
               },
               {
                 img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDB2wIUfUAQf2AeHVrjDdhOr4BXy_5HVWy2d-5DFyU0PGtYTiM40iW2CxdC0lIWGI8crMqzLJs4PuAHJ7ix-RPjWXu4FGB6fL-Ts7qH4ggHkAaPS5GUzOMtqVjaWEX8OlxGmHgaeHFR8FHJa164dQRpH6ojmR2v1tLudEc_UQ045mfWHBUtnpIbFSGWyKHbkatMZ1ph3SpgkiTLueLF3gEkEEhigm-W7cVg33NLgBM4JAuPV0AE-VZ1gahyNEKjzV0EiBPoE6ay3ElV=s0",
-                name: "The Capra Saas-Fee",
-                loc: "Швейцария, Альпы • 5 ночей",
                 old: "€4,100",
                 new: "€2,460",
-                disc: "-40%",
-                desc: "Шале премиум-класса. Использование региональных API цен."
               }
             ].map((item, i) => (
               <motion.div 
@@ -417,18 +585,18 @@ function Home() {
                   <img 
                     className="w-full h-full object-cover grayscale-0 group-hover:scale-105 transition-all duration-1000" 
                     src={item.img}
-                    alt={item.name}
+                    alt={t.cases.items[i].name}
                     referrerPolicy="no-referrer"
                   />
                 </div>
                 <div className="w-full lg:w-2/5 flex flex-col">
-                  <h4 className="font-headline text-3xl md:text-4xl text-on-surface mb-3 uppercase tracking-widest">{item.name}</h4>
-                  <p className="font-label text-on-surface-variant/60 text-[9px] md:text-[10px] uppercase tracking-[0.25em] mb-8">{item.loc}</p>
-                  <p className="font-body text-on-surface-variant/80 mb-10 font-light leading-relaxed text-sm md:text-base max-w-sm">{item.desc}</p>
+                  <h4 className="font-headline text-3xl md:text-4xl text-on-surface mb-3 uppercase tracking-widest">{t.cases.items[i].name}</h4>
+                  <p className="font-label text-on-surface-variant/60 text-[9px] md:text-[10px] uppercase tracking-[0.25em] mb-8">{t.cases.items[i].loc}</p>
+                  <p className="font-body text-on-surface-variant/80 mb-10 font-light leading-relaxed text-sm md:text-base max-w-sm">{t.cases.items[i].desc}</p>
                   
                   <div className="mt-auto space-y-8">
-                    <div className="bg-[#1C1812] text-primary/70 px-4 py-1.5 rounded-full font-label text-[8px] uppercase tracking-[0.2em] font-bold w-fit border border-primary/5">
-                      {item.disc} Savings
+                    <div className="bg-[#1C1812] text-primary/70 px-6 py-2 rounded-full font-label text-[10px] uppercase tracking-[0.2em] font-bold w-fit border border-primary/5">
+                      {t.cases.items[i].disc} Savings
                     </div>
                     <div className="flex items-center gap-6">
                       <span className="text-on-surface-variant/20 line-through text-base md:text-xl font-label">{item.old}</span>
@@ -447,12 +615,7 @@ function Home() {
       {/* Trust Metrics */}
       <section className="py-16 md:py-32 px-4 md:px-12 bg-surface">
         <div className="max-w-[1440px] mx-auto grid grid-cols-4 md:flex md:flex-wrap justify-between gap-1 md:gap-12 text-center md:text-left">
-          {[
-            { val: "2017", label: "Работаем с года" },
-            { val: "526+", label: "Объектов в базе" },
-            { val: "1,375", label: "Довольных клиентов" },
-            { val: "€342k", label: "Сэкономлено" }
-          ].map((metric, i) => (
+          {(t.trust as any[]).map((metric, i) => (
             <div key={i} className="flex flex-col items-center md:items-start">
               <div className="text-2xl md:text-6xl font-headline text-primary mb-1 md:mb-4 font-bold tracking-tight md:tracking-widest">{metric.val}</div>
               <div className="font-label text-[7px] md:text-[10px] text-on-surface-variant uppercase tracking-tighter md:tracking-[0.2em] font-medium leading-tight md:leading-normal">
@@ -466,9 +629,7 @@ function Home() {
       {/* New CTA Variant: Minimalist Dark */}
       <section className="py-20 md:py-60 px-6 md:px-12 bg-surface-container-lowest border-y border-primary/10">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="font-headline text-6xl md:text-8xl text-on-surface mb-12 uppercase tracking-tighter leading-none">
-            Готовы к <br /> <span className="text-primary italic font-light">новым открытиям?</span>
-          </h2>
+          <h2 className="font-headline text-6xl md:text-8xl text-on-surface mb-12 uppercase tracking-tighter leading-none" dangerouslySetInnerHTML={{ __html: t.cta.h2 }}></h2>
           <div className="flex flex-col sm:flex-row justify-center gap-12 items-center">
             <a 
               href="https://t.me/EASYBOOK_HOTELS"
@@ -476,15 +637,13 @@ function Home() {
               rel="noopener noreferrer"
               className="gold-gradient text-on-primary px-20 py-7 rounded-sm font-label text-xs uppercase tracking-[0.4em] font-bold active:scale-95 transition-all shadow-2xl"
             >
-              Запросить подборку
+              {t.cta.btn}
             </a>
             <a 
-              href="https://t.me/easybook_hotel"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/#cases"
               className="font-label text-xs uppercase tracking-[0.4em] text-on-surface-variant hover:text-primary transition-colors"
             >
-              Посмотреть кейсы
+              {t.cta.btnLink}
             </a>
           </div>
         </div>
@@ -493,22 +652,9 @@ function Home() {
       {/* FAQ Section */}
       <section id="faq" className="py-16 md:py-32 px-6 md:px-12 bg-surface-container-low">
         <div className="max-w-3xl mx-auto">
-          <h2 className="font-headline text-3xl text-on-surface mb-16 text-center uppercase tracking-widest">Часто задаваемые вопросы</h2>
+          <h2 className="font-headline text-3xl text-on-surface mb-16 text-center uppercase tracking-widest">{t.faq.title}</h2>
           <div className="space-y-6">
-            {[
-              {
-                q: "Почему цены такие низкие?",
-                a: "Мы используем корпоративные тарифы, доступ к которым имеют только крупные агенты, а также бронируем через партнерские каналы в других регионах, где цены на те же отели значительно ниже."
-              },
-              {
-                q: "Это легально?",
-                a: "Абсолютно. Вы получаете официальный ваучер отеля. Ваше бронирование будет отображаться в системе отеля так же, как если бы вы забронировали его сами."
-              },
-              {
-                q: "Что если я передумаю?",
-                a: "Условия отмены зависят от выбранного тарифа. Мы всегда предлагаем как невозвратные варианты с максимальной скидкой, так и гибкие тарифы с возможностью отмены."
-              }
-            ].map((faq, i) => (
+            {(t.faq.items as any[]).map((faq, i) => (
               <div 
                 key={i} 
                 className="bg-surface border border-outline-variant/5 rounded-sm overflow-hidden"
@@ -539,6 +685,7 @@ function Home() {
 }
 
 function PolicyPage({ title, date, content }: { title: string; date?: string; content: string }) {
+  const { t } = useTranslation();
   // Simple parser to style sections and bullet points
   const renderContent = (text: string) => {
     return text.split('\n').map((line, i) => {
@@ -578,7 +725,7 @@ function PolicyPage({ title, date, content }: { title: string; date?: string; co
       <div className="max-w-4xl mx-auto">
         <Link to="/" className="inline-flex items-center gap-2 text-primary/60 hover:text-primary transition-colors mb-16 group">
           <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="font-label text-[10px] uppercase tracking-[0.3em] font-medium">Вернуться на главную</span>
+          <span className="font-label text-[10px] uppercase tracking-[0.3em] font-medium">{t.common.back}</span>
         </Link>
         
         <div className="text-center mb-24">
@@ -598,7 +745,7 @@ function PolicyPage({ title, date, content }: { title: string; date?: string; co
 
         <div className="mt-32 pt-16 border-t border-primary/10 max-w-3xl mx-auto">
           <div className="flex flex-col items-center gap-6">
-            <span className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/40">Официальный запрос:</span>
+            <span className="font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/40">{t.common.request}</span>
             <a href="mailto:ezbook420@gmail.com" className="text-primary hover:text-primary-container text-2xl font-headline tracking-widest transition-colors">
               ezbook420@gmail.com
             </a>
@@ -610,17 +757,22 @@ function PolicyPage({ title, date, content }: { title: string; date?: string; co
 }
 
 export default function App() {
+  const [lang, setLang] = useState<Language>('RU');
+  const t = TRANSLATIONS[lang];
+
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path={POLICIES.privacy.path} element={<PolicyPage title={POLICIES.privacy.title} date={POLICIES.privacy.date} content={POLICIES.privacy.content} />} />
-          <Route path={POLICIES.terms.path} element={<PolicyPage title={POLICIES.terms.title} date={POLICIES.terms.date} content={POLICIES.terms.content} />} />
-          <Route path={POLICIES.cookies.path} element={<PolicyPage title={POLICIES.cookies.title} date={POLICIES.cookies.date} content={POLICIES.cookies.content} />} />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <LanguageContext.Provider value={{ lang, setLang, t }}>
+      <BrowserRouter>
+        <ScrollToTop />
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path={POLICIES.privacy.path} element={<PolicyPage title={POLICIES.privacy.title} date={POLICIES.privacy.date} content={POLICIES.privacy.content} />} />
+            <Route path={POLICIES.terms.path} element={<PolicyPage title={POLICIES.terms.title} date={POLICIES.terms.date} content={POLICIES.terms.content} />} />
+            <Route path={POLICIES.cookies.path} element={<PolicyPage title={POLICIES.cookies.title} date={POLICIES.cookies.date} content={POLICIES.cookies.content} />} />
+          </Routes>
+        </Layout>
+      </BrowserRouter>
+    </LanguageContext.Provider>
   );
 }
