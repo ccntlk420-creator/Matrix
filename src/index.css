@@ -1,63 +1,49 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@200;300;400;500;600&family=Montserrat:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-mono: "Roboto Mono", monospace;
-  
-  --color-matrix-green: #00FF00;
-  --color-matrix-red: #FF0000;
-  --color-matrix-bg: #000000;
+  --font-headline: "Cormorant Garamond", serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Montserrat", sans-serif;
+
+  --color-primary: #e9c176;
+  --color-primary-container: #c5a059;
+  --color-on-primary: #412d00;
+  --color-surface: #131313;
+  --color-surface-container-low: #1c1b1b;
+  --color-surface-container-high: #2a2a2a;
+  --color-surface-container-highest: #353535;
+  --color-surface-container-lowest: #0e0e0e;
+  --color-on-surface: #e5e2e1;
+  --color-on-surface-variant: #d1c5b4;
+  --color-outline-variant: #4e4639;
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   body {
-    @apply bg-matrix-bg text-matrix-green font-mono antialiased selection:bg-matrix-green selection:text-black overflow-x-hidden;
+    @apply bg-surface text-on-surface font-body selection:bg-primary selection:text-on-primary antialiased;
   }
 }
 
-@layer components {
-  .matrix-frame {
-    @apply border-[12px] border-matrix-green box-border;
+@layer utilities {
+  .gold-gradient {
+    background: linear-gradient(135deg, #e9c176 0%, #c5a059 100%);
   }
-
-  .matrix-grid-overlay {
-    background-image: linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, 0.03) 25%, rgba(0, 255, 0, 0.03) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.03) 75%, rgba(0, 255, 0, 0.03) 76%, transparent 77%, transparent), 
-                      linear-gradient(90deg, transparent 24%, rgba(0, 255, 0, 0.03) 25%, rgba(0, 255, 0, 0.03) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.03) 75%, rgba(0, 255, 0, 0.03) 76%, transparent 77%, transparent); 
-    background-size: 40px 40px;
+  .glass-panel {
+    background: rgba(53, 53, 53, 0.6);
+    backdrop-filter: blur(24px);
   }
-
-  .matrix-scanner {
-    @apply fixed inset-0 pointer-events-none z-50;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    background-size: 100% 2px, 3px 100%;
+  .custom-shadow {
+    box-shadow: 0 0 40px 0 rgba(229, 226, 225, 0.06);
   }
-
-  .matrix-card {
-    @apply border-t-2 border-matrix-green pt-6 pb-2 transition-all duration-300;
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
-
-  .matrix-pill-red {
-    @apply bg-matrix-red text-black py-3 px-6 font-bold uppercase hover:bg-white transition-colors text-xs text-center;
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
-
-  .matrix-pill-white {
-    @apply border border-white text-white py-3 px-6 font-bold uppercase hover:bg-white hover:text-black transition-colors text-xs text-center;
-  }
-
-  .matrix-heading {
-    @apply text-white font-black italic tracking-tighter leading-none uppercase;
-  }
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-black;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-matrix-green;
 }
