@@ -1,6 +1,6 @@
 {
-  "name": "Matrix Matrix",
-  "description": "A high-tech landing page exploring the simulation theory with a Dark Aero / Frutiger Ego aesthetic.",
+  "name": "Биборан — Теория завышенной численности",
+  "description": "Интерактивное конспирологическое расследование демографической гипотезы Биборана о реальной численности населения Земли.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -1,63 +1,124 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Машинописный шрифт досье: Courier New (Windows/macOS/iOS), Anonymous Pro (Android и прочие) */
 @theme {
-  --font-mono: "Roboto Mono", monospace;
-  
-  --color-matrix-green: #00FF00;
-  --color-matrix-red: #FF0000;
-  --color-matrix-bg: #000000;
+  --font-mono: 'Courier New', 'Anonymous Pro', Courier, monospace;
+  --font-serif: 'Courier New', 'Anonymous Pro', Courier, monospace;
+  --font-sans: 'Courier New', 'Anonymous Pro', Courier, monospace;
 }
 
 @layer base {
+  :root {
+    --bg-main: #101216;
+    --bg-secondary: #191D23;
+    --accent-red: #B83A3A;
+    --accent-gold: #C5A46D;
+    --text-primary: #E8E6DF;
+    --text-muted: #8E95A2;
+  }
+
   body {
-    @apply bg-matrix-bg text-matrix-green font-mono antialiased selection:bg-matrix-green selection:text-black overflow-x-hidden;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+  }
+
+  h1, h2, h3, .font-serif-title, .font-monument, code, pre, .font-telemetry {
+    font-family: var(--font-mono);
+  }
+
+  .font-dossier {
+    font-family: var(--font-mono);
   }
 }
 
-@layer components {
-  .matrix-frame {
-    @apply border-[12px] border-matrix-green box-border;
-  }
-
-  .matrix-grid-overlay {
-    background-image: linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, 0.03) 25%, rgba(0, 255, 0, 0.03) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.03) 75%, rgba(0, 255, 0, 0.03) 76%, transparent 77%, transparent), 
-                      linear-gradient(90deg, transparent 24%, rgba(0, 255, 0, 0.03) 25%, rgba(0, 255, 0, 0.03) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, 0.03) 75%, rgba(0, 255, 0, 0.03) 76%, transparent 77%, transparent); 
-    background-size: 40px 40px;
-  }
-
-  .matrix-scanner {
-    @apply fixed inset-0 pointer-events-none z-50;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    background-size: 100% 2px, 3px 100%;
-  }
-
-  .matrix-card {
-    @apply border-t-2 border-matrix-green pt-6 pb-2 transition-all duration-300;
-  }
-
-  .matrix-pill-red {
-    @apply bg-matrix-red text-black py-3 px-6 font-bold uppercase hover:bg-white transition-colors text-xs text-center;
-  }
-
-  .matrix-pill-white {
-    @apply border border-white text-white py-3 px-6 font-bold uppercase hover:bg-white hover:text-black transition-colors text-xs text-center;
-  }
-
-  .matrix-heading {
-    @apply text-white font-black italic tracking-tighter leading-none uppercase;
-  }
+/* Atmospheric archival scanline & grid effects */
+.bg-grid-subtle {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(197, 164, 109, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(197, 164, 109, 0.04) 1px, transparent 1px);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+.bg-dot-matrix {
+  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(197, 164, 109, 0.08) 1px, transparent 1px);
 }
 
-::-webkit-scrollbar-track {
-  @apply bg-black;
+/* Archival Graph Paper Texture */
+.bg-graph-paper {
+  background-color: #F4EFE6;
+  background-image: 
+    linear-gradient(to right, rgba(180, 160, 130, 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(180, 160, 130, 0.18) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
-::-webkit-scrollbar-thumb {
-  @apply bg-matrix-green;
+.bg-graph-paper-dark {
+  background-color: #12151B;
+  background-image: 
+    linear-gradient(to right, rgba(197, 164, 109, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(197, 164, 109, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
+
+.bg-graph-paper-minimal {
+  background-color: #FAF8F5;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Outlined font effect like in reference image with guaranteed visibility */
+.text-outline-archival {
+  -webkit-text-stroke: 1.5px currentColor;
+  color: #B83A3A;
+  font-weight: 900;
+}
+
+/* Redaction censor bars */
+.censor-bar {
+  background-color: #1A1A1A;
+  color: transparent;
+  user-select: none;
+  border-radius: 2px;
+  padding: 0 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.censor-bar.revealed {
+  background-color: rgba(184, 58, 58, 0.15);
+  color: #B83A3A;
+  user-select: text;
+}
+
+/* Rubber stamps */
+.stamp-verified {
+  border: 2px solid #B83A3A;
+  color: #B83A3A;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: rotate(-3deg);
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.stamp-classified {
+  border: 2px solid #B83A3A;
+  color: #B83A3A;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transform: rotate(2deg);
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 2px;
+}
+
